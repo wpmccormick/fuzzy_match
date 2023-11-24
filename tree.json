@@ -1,0 +1,10 @@
+{
+	"tray former": ["extractor", "transfer", "feeder", "hammer"],
+	"pick & place": ["servo", "vacuum", "brake", "suction"],
+	"box filler": ["conveyor","Closing wheel","pusher","centering flaps"],
+	"elevator": ["servo", "pusher", "drive"],
+	"stacker": ["servo","stop","roof","jam"],
+	"box sealer": ["closer","presser","conveyor"],
+	"greaser": [],
+	"safety": []
+}
