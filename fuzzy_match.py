@@ -62,10 +62,10 @@ def arg_parse():
 	parser.add_argument('-v', '--verbose',	action='store_true', help="Print more information to the console")
 
 	parser.add_argument(
-		'-s', 
-		'--source', 
+		'-t', 
+		'--test', 
 		required=True, 
-		help="Path to the source input CSV file"
+		help="Path to the test input CSV file"
 	)
 
 	parser.add_argument(
@@ -73,6 +73,13 @@ def arg_parse():
 		'--relation', 
 		required=True, 
 		help="Path to the relation input CSV file"
+	)
+	
+	parser.add_argument(
+		'-s', 
+		'--score', 
+		required=True, 
+		help="Minium score to be considered a match"
 	)
 	
 	# parser.add_argument(
@@ -149,15 +156,26 @@ def calc_scores(test, reference):
 
 	return scores
 
+
+def replace_strings(original_string, replacements_dict):
+	"""Replace strings in the original string with the replacement strings."""
+
+	for key in replacements_dict:
+		for value in replacements_dict[key]:
+			original_string = original_string.replace(value, key)
+
+	return original_string
+
 def main():
 
 	try:
 		args = arg_parse()
 
-		test_file_name = args.source
+		test_file_name = args.test
 		relation_file_name = args.relation
 		#out_file_name = args.outfile
 		config_file_name = args.config
+		min_score = int(args.score)
 
 		#open the json file and read the logic config
 		with open(config_file_name, 'r',encoding=args.encoding) as config_file:
@@ -169,7 +187,9 @@ def main():
 			relation_filter = create_filter(config["relation"]["filter"])
 			relation_text = config["relation"]["text"]
 			relation_ignore = config["relation"]["ignore"]
-			min_score = config["fuzz"]["score"]
+			relation_alias = config["relation"]["alias"]
+
+			print("alias: %s" % relation_alias)
 			#output_columns = config["output"].keys()
 		except KeyError as e:
 			raise JsonConfigKeyError("Key [%s] is missing from the JSON config file." % e)
@@ -193,7 +213,7 @@ def main():
 			rel_csv_reader = csv.DictReader(relation_file)
 			relation_data = list(rel_csv_reader)
 
-		print("Classification started ingesting file [%s] with relationships [%s]." % (test_file_name, relation_file_name))
+		print("Fuzzy matching started ingesting file [%s] looking for matches in [%s]." % (test_file_name, relation_file_name))
 
 		for test_index, test_row in enumerate(test_data):
 			test_string = ""
@@ -203,6 +223,11 @@ def main():
 			
 			for col in test_text:
 				test_string += test_row[col] + " "
+			
+			test_string = test_string.strip()
+			
+			# replace alias
+			test_string_alias = replace_strings(test_string, relation_alias)
 
 			max_score = {}
 			max_score["score"] = 0
@@ -215,28 +240,30 @@ def main():
 
 				for col in relation_text:
 					rel_string += rel_row[col] + " "
-				
+
+				rel_string = rel_string.strip()
+					
 				if any(str in rel_string for str in relation_ignore):
 					continue
 					
-				scores = calc_scores(test_string, rel_string)
+				scores = calc_scores(test_string_alias, rel_string)
 
-				for score in scores:
-					if scores[score] >= min_score and scores[score] > max_score["score"]:
-						max_score["score"] = scores[score]
-						max_score["method"] = score
-						max_score["match_index"] = rel_index
+				for method in scores:
+					if scores[method] >= min_score and scores[method] > max_score["score"]:
 						max_score["match_string"] = rel_string
+						max_score["score"] = scores[method]
+						max_score["method"] = method
+						#max_score["match_index"] = rel_index
 			
 			if max_score["score"] > min_score:
-				print(test_string)
-				for key in max_score:
-					print(f"\t{key}: {max_score[key]}")
+				print(f'{test_string},{max_score["match_string"]},{max_score["score"]},{max_score["method"]}')
+				# for key in max_score:
+				# 	print(f"\t{key}: {max_score[key]}")
 
 
 	except Exception as e:
 		import traceback
-		print("Fault Mapping failed: [%s]" % e)
+		print("Fuzzy match failed: [%s]" % e)
 		if args.verbose:
 			traceback.print_exc()
 

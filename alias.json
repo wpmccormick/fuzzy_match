@@ -1,4 +1,0 @@
-{
-	"servo": ["axis", "homing"],
-	"safety": ["emergency"]
-}

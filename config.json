@@ -1,7 +1,4 @@
 {
-	"fuzz": {
-		"score": 80
-	},
 	"source": {
 		"filter": "Fault=Yes",
 		"text": ["Name"]
@@ -9,6 +6,12 @@
 	"relation": {
 		"filter": "model=Arcil 11+C1Name=Packer",
 		"text": ["C2Name","C3Name"],
-		"ignore": ["EXPLAIN"]
+		"ignore": ["EXPLAIN","NC REQUIRED"],
+		"alias": {
+			"Extractor": ["Box filler","Pick&Place"],
+			"Feeder": ["Tray Former"],
+			"Closing": ["Case Sealer","Box sealer"],
+			"Outfeed": ["Stacker","Elevator"]
+		}
 	}
 }
