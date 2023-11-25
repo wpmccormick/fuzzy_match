@@ -1,0 +1,14 @@
+{
+	"fuzz": {
+		"score": 80
+	},
+	"source": {
+		"filter": "Fault=Yes",
+		"text": ["Name"]
+	},
+	"relation": {
+		"filter": "model=Arcil 11+C1Name=Packer",
+		"text": ["C2Name","C3Name"],
+		"ignore": ["EXPLAIN"]
+	}
+}
