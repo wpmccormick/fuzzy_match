@@ -2,6 +2,7 @@
 Uses Fuzzy String Matching to make connections between 2 lists of strings. Accepts input from a *test* CSV file and makes comparisons with a *relation* input CSV file based on parameters set in a configuration file.
 
 ## command line options
+```
   -t TEST, --test TEST  				Path to the test input CSV file
   -r RELATION, --relation RELATION		Path to the relation input CSV file
   -s SCORE, --score SCORE				Minium score to be considered a match
@@ -10,7 +11,7 @@ Uses Fuzzy String Matching to make connections between 2 lists of strings. Accep
   -h, --help            				show this help message and exit
   --version             				show program's version number and exit
   -v, --verbose         				Print more information to the console
-
+```
 ## configurtion
 Unless otherwsie specified with the *config* option the *config.json*  file is used with the following parameters:
 ```
