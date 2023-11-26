@@ -6,7 +6,6 @@ from thefuzz import fuzz
 import argparse
 import json
 import csv
-import os
 
 class JsonConfigKeyError(KeyError):
 	"""Custom exception for missing keys in the JSON config file."""
@@ -103,14 +102,6 @@ def arg_parse():
 		help='Select a file output encoding: [utf-8, utf-16, utf-32, ascii, latin1, cp1252, etc.]; default utf-8'
 	)
 
-	# parser.add_argument(
-	# 	'-t',
-	# 	'--test', 
-	# 	action='store_const', 
-	# 	const=True,
-	# 	help="Don't generate output file; just test the filter."
-	# )
-
 	# Parse the command line arguments
 	args = parser.parse_args()
 
@@ -124,11 +115,6 @@ def create_filter(filter_str):
 		raise ValueError("Filter format not correct: [%s]" % e)
 	except Exception as e:
 		raise Exception("Exception handling filter: [%s]" % e)
-
-	# if filter:		
-	# 	print("Filtering rows based on the following criteria:") 		
-	# 	for key in filter.filter_dict:
-	# 		print("  %s=%s" % (key, filter.filter_dict[key]))
 
 	return filter
 
@@ -150,9 +136,6 @@ def calc_scores(test, reference):
 
 	# Calculate the sort ratio
 	scores["sort_ratio"] = fuzz.partial_token_sort_ratio(test, reference)
-
-	# Calculate the average of the Levenshtein and partial ratio, set and sort scores
-	# avg_score = (lev_ratio + partial_ratio + set_ratio + sort_ratio) / 4
 
 	return scores
 
@@ -252,12 +235,9 @@ def main():
 						max_score["match_string"] = rel_string
 						max_score["score"] = scores[method]
 						max_score["method"] = method
-						#max_score["match_index"] = rel_index
 			
-			if max_score["score"] > min_score:
+			if max_score["score"] >= min_score:
 				print(f'{test_string},{max_score["match_string"]},{max_score["score"]},{max_score["method"]}')
-				# for key in max_score:
-				# 	print(f"\t{key}: {max_score[key]}")
 
 
 	except Exception as e:

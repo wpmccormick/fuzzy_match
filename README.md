@@ -13,7 +13,7 @@ Uses Fuzzy String Matching to make connections between 2 lists of strings. Accep
   -v, --verbose         				Print more information to the console
 ```
 ## configurtion
-Unless otherwsie specified with the *config* option the *config.json*  file is used with the following parameters:
+Unless otherwsie specified with the *config* option the *config.json* file is used with the following parameters:
 ```
 {
 	"source": {
@@ -35,10 +35,10 @@ Unless otherwsie specified with the *config* option the *config.json*  file is u
 ```
 
 ### source
-Defines which columns to join together for testing against relations using the list of *text*  column names. Use *filter* to consider rows that match some condition. Multiple conditions can be specified (OR with ,; AND with +) . 
+Defines which columns to join together for testing against relations using the list of *text* column names. Use *filter* to only consider rows that match some condition. Multiple conditions can be specified (OR with ,; AND with +) . 
 
 ### relation
-Defines which columns to join together for relations that are tested against using the list of *text*  column names. Use *filter* to consider rows that match some condition. Multiple conditions can be specified (OR with ,; AND with +). Use *ignore* to skip any text that contains words in the list. Use *alias* to replace test words from the source before scoring to improve scores.
+Defines which columns to join together for relations that are tested against using the list of *text* column names. Use *filter* to only consider rows that match some condition. Multiple conditions can be specified (OR with ,; AND with +). Use *ignore* to skip any text that contains words in the list. Use *alias* to replace test words from the source before scoring to improve scores.
 
 ## output
 The output is a CSV format with the following columns:
