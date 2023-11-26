@@ -1,5 +1,6 @@
 # fuzzy_match
 Uses Fuzzy String Matching to make connections between 2 lists of strings. Accepts input from a *test* CSV file and makes comparisons with a *relation* input CSV file based on parameters set in a configuration file.
+
 ## command line options
   -t TEST, --test TEST  				Path to the test input CSV file
   -r RELATION, --relation RELATION		Path to the relation input CSV file
@@ -31,6 +32,7 @@ Unless otherwsie specified with the *config* option the *config.json*  file is u
 	}
 }
 ```
+
 ### source
 Defines which columns to join together for testing against relations using the list of *text*  column names. Use *filter* to consider rows that match some condition. Multiple conditions can be specified (OR with ,; AND with +) . 
 
@@ -42,8 +44,11 @@ The output is a CSV format with the following columns:
 ```
 <Original source/test text>,<matched text from relations>,<score>,<fuzzy method with highest score>
 ```
+
 ## references
 [Fuzzy String Matching in Python Tutorial](https://www.datacamp.com/tutorial/fuzzy-string-python)
+
 [thefuzz on gitub](https://github.com/seatgeek/thefuzz)
+
 [Senzing - $$$](https://senzing.com/)
 
