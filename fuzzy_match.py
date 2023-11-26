@@ -6,6 +6,7 @@ from thefuzz import fuzz
 import argparse
 import json
 import csv
+import os
 
 class JsonConfigKeyError(KeyError):
 	"""Custom exception for missing keys in the JSON config file."""
@@ -81,12 +82,11 @@ def arg_parse():
 		help="Minium score to be considered a match"
 	)
 	
-	# parser.add_argument(
-	# 	'-o',
-	# 	'--outfile', 
-	# 	required=True,
-	# 	help="Output file name."
-	# )
+	parser.add_argument(
+		'-o',
+		'--outfile', 
+		help="Output file name."
+	)
 
 	parser.add_argument(
 		'-c', 
@@ -156,9 +156,11 @@ def main():
 
 		test_file_name = args.test
 		relation_file_name = args.relation
-		#out_file_name = args.outfile
+		out_file_name = args.outfile
 		config_file_name = args.config
 		min_score = int(args.score)
+		header_done = False
+
 
 		#open the json file and read the logic config
 		with open(config_file_name, 'r',encoding=args.encoding) as config_file:
@@ -171,19 +173,15 @@ def main():
 			relation_text = config["relation"]["text"]
 			relation_ignore = config["relation"]["ignore"]
 			relation_alias = config["relation"]["alias"]
-
-			#output_columns = config["output"].keys()
+			output_columns = config["output"]
 		except KeyError as e:
 			raise JsonConfigKeyError("Key [%s] is missing from the JSON config file." % e)
 		except Exception as e:
 			raise Exception("Exception handling filter: [%s]" % e)
 
-		# if out_file_name is None:
-		# 	raise Exception("Output file cannot be none")
-
-		# # ask to overwrite the output file exists
-		# if os.path.isfile(out_file_name) and not args.test:
-		# 	raise FileExistsError("Output file [%s] already exists." % out_file_name) # pylint: disable=undefined-variable
+		# ask to overwrite the output file exists
+		if out_file_name is not None and os.path.isfile(out_file_name):
+			raise FileExistsError("Output file [%s] already exists." % out_file_name) # pylint: disable=undefined-variable
 		
 		# Read the source test file
 		with open(test_file_name, 'r', encoding=args.encoding) as test_file:
@@ -235,9 +233,38 @@ def main():
 						max_score["match_string"] = rel_string
 						max_score["score"] = scores[method]
 						max_score["method"] = method
+						max_score["match_index"] = rel_index
 			
+			column_headers = []
+			columns = []
+
 			if max_score["score"] >= min_score:
-				print(f'{test_string},{max_score["match_string"]},{max_score["score"]},{max_score["method"]}')
+				for output_column in output_columns:
+					column_headers.append(*output_column.keys())
+					column = list(output_column.values())
+					source_column = list(column[0].values())[0]
+					if "source" in column[0].keys():
+						data = test_data[test_index][source_column]
+						columns.append(data)
+					elif "relation" in column[0].keys():
+						data = relation_data[max_score["match_index"]][source_column]
+						columns.append(data)
+					elif "fuzz" in column[0].keys():
+						data = max_score[source_column]
+						columns.append(str(data))
+					else:
+						raise Exception("Output column [%s] is missing a source or relation key." % output_column)
+
+				if out_file_name is not None:
+					with open(out_file_name, 'a', encoding=args.encoding) as out_file:
+						if not header_done:
+							header_done = True
+							out_csv_writer = csv.writer(out_file)
+							out_csv_writer.writerow(column_headers)
+						out_csv_writer = csv.writer(out_file)
+						out_csv_writer.writerow(columns)
+				else:
+					print(",".join(columns))
 
 
 	except Exception as e:

@@ -13,5 +13,14 @@
 			"Closing": ["Case Sealer","Box sealer"],
 			"Outfeed": ["Stacker","Elevator"]
 		}
-	}
+	},
+	"output": [
+		{"C1Name": {"relation": "C1Name"}},
+		{"C2Name": {"relation": "C2Name"}},
+		{"C3Name": {"relation": "C3Name"}},
+		{"State": {"source": "OEE_State"}},
+		{"Fault": {"source": "Name"}},
+		{"Score": {"fuzz": "score"}},
+		{"Method": {"fuzz": "method"}}
+	]
 }

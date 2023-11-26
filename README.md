@@ -5,6 +5,7 @@ Uses Fuzzy String Matching to make connections between 2 lists of strings. Accep
 ```
   -t TEST, --test TEST  				Path to the test input CSV file
   -r RELATION, --relation RELATION		Path to the relation input CSV file
+  -o OUTFILE, --outfile OUTFILE			Output file name.
   -s SCORE, --score SCORE				Minium score to be considered a match
   -c CONFIG, --config CONFIG			Path to configuration file. Default: config.json
   -e ENCODING, --encoding ENCODING		Select a file output encoding: [utf-8, utf-16, utf-32, ascii, latin1, cp1252, etc.]; default utf-8
@@ -29,8 +30,16 @@ Unless otherwsie specified with the *config* option the *config.json* file is us
 			"Feeder": ["Tray Former"],
 			"Closing": ["Case Sealer","Box sealer"],
 			"Outfeed": ["Stacker","Elevator"]
-		}
-	}
+		},
+	"output": [
+		{"C1Name": {"relation": "C1Name"}},
+		{"C2Name": {"relation": "C2Name"}},
+		{"C3Name": {"relation": "C3Name"}},
+		{"State": {"source": "OEE_State"}},
+		{"Fault": {"source": "Name"}},
+		{"Score": {"fuzz": "score"}},
+		{"Method": {"fuzz": "method"}}
+	]
 }
 ```
 
@@ -40,11 +49,8 @@ Defines which columns to join together for testing against relations using the l
 ### relation
 Defines which columns to join together for relations that are tested against using the list of *text* column names. Use *filter* to only consider rows that match some condition. Multiple conditions can be specified (OR with ,; AND with +). Use *ignore* to skip any text that contains words in the list. Use *alias* to replace test words from the source before scoring to improve scores.
 
-## output
-The output is a CSV format with the following columns:
-```
-<Original source/test text>,<matched text from relations>,<score>,<fuzzy method with highest score>
-```
+### output
+If the *output* file path is given, the output is a CSV file format with the configured columns. If the *output* is not given, matches are printed to the console.
 
 ## references
 [Fuzzy String Matching in Python Tutorial](https://www.datacamp.com/tutorial/fuzzy-string-python)
