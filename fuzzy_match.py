@@ -55,10 +55,10 @@ class Filter:
 
 def arg_parse():
 	# Create an argument parser
-	parser = argparse.ArgumentParser(description="Fault Mapper")
+	parser = argparse.ArgumentParser(description="Fuzzy match two CSV files.")
 
 	# Specify the CSV and XML files as a command line argument
-	parser.add_argument('--version', action='version', version='%(prog)s 0.1')
+	parser.add_argument('--version', action='version', version='%(prog)s 1.0')
 	parser.add_argument('-v', '--verbose',	action='store_true', help="Print more information to the console")
 
 	parser.add_argument(
@@ -189,7 +189,6 @@ def main():
 			relation_ignore = config["relation"]["ignore"]
 			relation_alias = config["relation"]["alias"]
 
-			print("alias: %s" % relation_alias)
 			#output_columns = config["output"].keys()
 		except KeyError as e:
 			raise JsonConfigKeyError("Key [%s] is missing from the JSON config file." % e)
