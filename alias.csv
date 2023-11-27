@@ -1,0 +1,8 @@
+Model,C1Name,Text,Alias
+Arcil 11,Packer,Extractor,Box filler
+Arcil 11,Packer,Extractor,Pick&Place
+Arcil 11,Packer,Feeder,Tray Former
+Arcil 11,Packer,Closing,Case Sealer
+Arcil 11,Packer,Closing,Box sealer
+Arcil 11,Packer,Outfeed,Stacker
+Arcil 11,Packer,Outfeed,Conveyor

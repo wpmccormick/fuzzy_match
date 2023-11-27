@@ -62,8 +62,8 @@ def arg_parse():
 	parser.add_argument('-v', '--verbose',	action='store_true', help="Print more information to the console")
 
 	parser.add_argument(
-		'-t', 
-		'--test', 
+		'-s', 
+		'--source', 
 		required=True, 
 		help="Path to the test input CSV file"
 	)
@@ -73,6 +73,12 @@ def arg_parse():
 		'--relation', 
 		required=True, 
 		help="Path to the relation input CSV file"
+	)
+	
+	parser.add_argument(
+		'-a', 
+		'--alias', 
+		help="Path to source/relation alias file"
 	)
 	
 	parser.add_argument(
@@ -154,8 +160,9 @@ def main():
 	try:
 		args = arg_parse()
 
-		test_file_name = args.test
+		source_file_name = args.source
 		relation_file_name = args.relation
+		alias_file_name = args.alias
 		out_file_name = args.outfile
 		config_file_name = args.config
 		min_score = int(args.score)
@@ -167,12 +174,12 @@ def main():
 			config = json.load(config_file)
 
 		try:
-			test_filter = create_filter(config["source"]["filter"])
-			test_text = config["source"]["text"]
+			source_filter = create_filter(config["source"]["filter"])
+			source_text = config["source"]["text"]
 			relation_filter = create_filter(config["relation"]["filter"])
 			relation_text = config["relation"]["text"]
 			relation_ignore = config["relation"]["ignore"]
-			relation_alias = config["relation"]["alias"]
+			#relation_alias = config["relation"]["alias"]
 			output_columns = config["output"]
 		except KeyError as e:
 			raise JsonConfigKeyError("Key [%s] is missing from the JSON config file." % e)
@@ -184,30 +191,38 @@ def main():
 			raise FileExistsError("Output file [%s] already exists." % out_file_name) # pylint: disable=undefined-variable
 		
 		# Read the source test file
-		with open(test_file_name, 'r', encoding=args.encoding) as test_file:
-			test_csv_reader = csv.DictReader(test_file)
-			test_data = list(test_csv_reader)
+		with open(source_file_name, 'r', encoding=args.encoding) as source_file:
+			source_csv_reader = csv.DictReader(source_file)
+			source_data = list(source_csv_reader)
 
 		# Read the relation file
 		with open(relation_file_name, 'r', encoding=args.encoding) as relation_file:
 			rel_csv_reader = csv.DictReader(relation_file)
 			relation_data = list(rel_csv_reader)
 
-		print("Fuzzy matching started ingesting file [%s] looking for matches in [%s]." % (test_file_name, relation_file_name))
+		# Read the alias file
+		with open(alias_file_name, 'r', encoding=args.encoding) as alias_file:
+			alias_csv_reader = csv.DictReader(alias_file)
+			alias_data = list(alias_csv_reader)
 
-		for test_index, test_row in enumerate(test_data):
-			test_string = ""
+		print(alias_data)
+		exit(0)
+		
+		print("Fuzzy matching started ingesting file [%s] looking for matches in [%s]." % (source_file_name, relation_file_name))
 
-			if test_filter and not test_filter.match(test_row):
+		for source_index, source_row in enumerate(source_data):
+			source_string = ""
+
+			if source_filter and not source_filter.match(source_row):
 				continue
 			
-			for col in test_text:
-				test_string += test_row[col] + " "
+			for col in source_text:
+				source_string += source_row[col] + " "
 			
-			test_string = test_string.strip()
+			source_string = source_string.strip()
 			
 			# replace alias
-			test_string_alias = replace_strings(test_string, relation_alias)
+			source_string_alias = replace_strings(source_string, alias_data)
 
 			max_score = {}
 			max_score["score"] = 0
@@ -226,7 +241,7 @@ def main():
 				if any(str in rel_string for str in relation_ignore):
 					continue
 					
-				scores = calc_scores(test_string_alias, rel_string)
+				scores = calc_scores(source_string_alias, rel_string)
 
 				for method in scores:
 					if scores[method] >= min_score and scores[method] > max_score["score"]:
@@ -244,7 +259,7 @@ def main():
 					column = list(output_column.values())
 					source_column = list(column[0].values())[0]
 					if "source" in column[0].keys():
-						data = test_data[test_index][source_column]
+						data = source_data[source_index][source_column]
 						columns.append(data)
 					elif "relation" in column[0].keys():
 						data = relation_data[max_score["match_index"]][source_column]
