@@ -4,6 +4,7 @@ from __future__ import print_function
 from sys import exit
 from thefuzz import fuzz
 import argparse
+import yaml
 import json
 import csv
 import os
@@ -82,7 +83,6 @@ def arg_parse():
 	)
 	
 	parser.add_argument(
-		'-s', 
 		'--score', 
 		required=True, 
 		help="Minium score to be considered a match"
@@ -200,12 +200,25 @@ def main():
 			rel_csv_reader = csv.DictReader(relation_file)
 			relation_data = list(rel_csv_reader)
 
-		# Read the alias file
-		with open(alias_file_name, 'r', encoding=args.encoding) as alias_file:
-			alias_csv_reader = csv.DictReader(alias_file)
-			alias_data = list(alias_csv_reader)
+		with open(alias_file_name, 'r') as file:
+			try:
+				alias_data = yaml.safe_load(file)
+			except yaml.YAMLError as e:
+				raise Exception(f"Error reading YAML file '{alias_file_name}': {e}")
 
-		print(alias_data)
+		print(alias_data)	
+
+		# Read the alias file
+		# with open(alias_file_name, 'r', encoding=args.encoding) as alias_file:
+		# 	alias_csv_reader = csv.DictReader(alias_file)
+		# 	alias_data = list(alias_csv_reader)
+
+		# 	alias_list = []
+
+		# 	for alias in alias_data:
+		# 		for key in alias.keys():
+		# 			alias[key] = alias[key].split("|")
+
 		exit(0)
 		
 		print("Fuzzy matching started ingesting file [%s] looking for matches in [%s]." % (source_file_name, relation_file_name))

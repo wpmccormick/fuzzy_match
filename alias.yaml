@@ -1,0 +1,13 @@
+Arcil 11:
+  - Paker:
+    - Extractor:
+      - Box filler
+      - Pick&Place
+    - Feeder:
+      - Tray Former
+    - Closing:
+      - Case Sealer
+      - Box sealer
+    - Outfeed:
+      - Stacker
+      - Conveyor
