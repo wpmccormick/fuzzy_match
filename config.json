@@ -6,13 +6,7 @@
 	"relation": {
 		"filter": "model=Arcil 11+C1Name=Packer",
 		"text": ["C2Name","C3Name"],
-		"ignore": ["EXPLAIN","NC REQUIRED"],
-		"alias": {
-			"Extractor": ["Box filler","Pick&Place"],
-			"Feeder": ["Tray Former"],
-			"Closing": ["Case Sealer","Box sealer"],
-			"Outfeed": ["Stacker","Elevator"]
-		}
+		"ignore": ["EXPLAIN","NC REQUIRED"]
 	},
 	"output": [
 		{"C1Name": {"relation": "C1Name"}},

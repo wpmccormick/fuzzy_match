@@ -149,6 +149,8 @@ def calc_scores(test, reference):
 def replace_strings(original_string, replacements_dict):
 	"""Replace strings in the original string with the replacement strings."""
 
+	print("Replacing strings in [%s] with [%s]." % (original_string, replacements_dict))
+	
 	for key in replacements_dict:
 		for value in replacements_dict[key]:
 			original_string = original_string.replace(value, key)
@@ -179,7 +181,6 @@ def main():
 			relation_filter = create_filter(config["relation"]["filter"])
 			relation_text = config["relation"]["text"]
 			relation_ignore = config["relation"]["ignore"]
-			#relation_alias = config["relation"]["alias"]
 			output_columns = config["output"]
 		except KeyError as e:
 			raise JsonConfigKeyError("Key [%s] is missing from the JSON config file." % e)
@@ -206,21 +207,6 @@ def main():
 			except yaml.YAMLError as e:
 				raise Exception(f"Error reading YAML file '{alias_file_name}': {e}")
 
-		print(alias_data)	
-
-		# Read the alias file
-		# with open(alias_file_name, 'r', encoding=args.encoding) as alias_file:
-		# 	alias_csv_reader = csv.DictReader(alias_file)
-		# 	alias_data = list(alias_csv_reader)
-
-		# 	alias_list = []
-
-		# 	for alias in alias_data:
-		# 		for key in alias.keys():
-		# 			alias[key] = alias[key].split("|")
-
-		exit(0)
-		
 		print("Fuzzy matching started ingesting file [%s] looking for matches in [%s]." % (source_file_name, relation_file_name))
 
 		for source_index, source_row in enumerate(source_data):
@@ -233,7 +219,7 @@ def main():
 				source_string += source_row[col] + " "
 			
 			source_string = source_string.strip()
-			
+
 			# replace alias
 			source_string_alias = replace_strings(source_string, alias_data)
 
