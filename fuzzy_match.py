@@ -149,8 +149,6 @@ def calc_scores(test, reference):
 def replace_strings(original_string, replacements_dict):
 	"""Replace strings in the original string with the replacement strings."""
 
-	print("Replacing strings in [%s] with [%s]." % (original_string, replacements_dict))
-	
 	for key in replacements_dict:
 		for value in replacements_dict[key]:
 			original_string = original_string.replace(value, key)
@@ -207,7 +205,11 @@ def main():
 			except yaml.YAMLError as e:
 				raise Exception(f"Error reading YAML file '{alias_file_name}': {e}")
 
+
 		print("Fuzzy matching started ingesting file [%s] looking for matches in [%s]." % (source_file_name, relation_file_name))
+
+		output_rows_match = []
+		output_rows_no_match = []
 
 		for source_index, source_row in enumerate(source_data):
 			source_string = ""
@@ -268,17 +270,38 @@ def main():
 						columns.append(str(data))
 					else:
 						raise Exception("Output column [%s] is missing a source or relation key." % output_column)
+				
+				output_rows_match.append(columns)
+			else:
+				for output_column in output_columns:
+					column_headers.append(*output_column.keys())
+					column = list(output_column.values())
+					source_column = list(column[0].values())[0]
+					if "source" in column[0].keys():
+						data = source_data[source_index][source_column]
+						columns.append(data)
+					else:
+						raise Exception("Output column [%s] is missing a source or relation key." % output_column)
+				
+				output_rows_no_match.append(columns)
 
-				if out_file_name is not None:
-					with open(out_file_name, 'a', encoding=args.encoding) as out_file:
-						if not header_done:
-							header_done = True
-							out_csv_writer = csv.writer(out_file)
-							out_csv_writer.writerow(column_headers)
-						out_csv_writer = csv.writer(out_file)
-						out_csv_writer.writerow(columns)
-				else:
-					print(",".join(columns))
+		# Write the output file
+		with open(out_file_name, 'w', encoding=args.encoding) as out_file:
+			out_csv_writer = csv.writer(out_file)
+			out_csv_writer.writerow(column_headers)
+			out_csv_writer.writerows(output_rows_match)
+			out_csv_writer.writerows(output_rows_no_match)
+
+		# if out_file_name is not None:
+		# 	with open(out_file_name, 'a', encoding=args.encoding) as out_file:
+		# 		if not header_done:
+		# 			header_done = True
+		# 			out_csv_writer = csv.writer(out_file)
+		# 			out_csv_writer.writerow(column_headers)
+		# 		out_csv_writer = csv.writer(out_file)
+		# 		out_csv_writer.writerow(columns)
+		# else:
+		# 	print(",".join(columns))
 
 
 	except Exception as e:
